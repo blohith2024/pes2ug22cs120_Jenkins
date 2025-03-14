@@ -1,36 +1,41 @@
 pipeline {
-    agent {
-        docker {
-            image 'node:14'
+    agent any  // This runs on any available agent
+
+    stages {
+        stage('Clone Repository') {
+            steps {
+                git branch: 'main', url: 'https://github.com/blohith2024/pes2ug22cs120_Jenkins.git'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                echo 'Building the project...'
+                sh 'echo Build successful'  // Replace with actual build command
+            }
+        }
+
+        stage('Test') {
+            steps {
+                echo 'Running tests...'
+                sh 'echo Tests passed'  // Replace with actual test command
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                echo 'Deploying application...'
+                sh 'echo Deployment complete'  // Replace with actual deployment command
+            }
         }
     }
-    stages {
-        stage('Clone repository') {
-            steps {
-                git branch: 'main',
-                    url: 'https://github.com/blohith2024/pes2ug22cs120_Jenkins'
-            }
+
+    post {
+        success {
+            echo 'Pipeline executed successfully!'
         }
-        stage('Install dependencies') {
-            steps {
-                sh 'npm install'
-            }
-        }
-        stage('Build application') {
-            steps {
-                sh 'npm run build'
-            }
-        }
-        stage('Test application') {
-            steps {
-                sh 'npm test'
-            }
-        }
-        stage('Push Docker image') {
-            steps {
-                sh 'docker build -t <user>/<image>:$BUILD_NUMBER .'
-                sh 'docker push <user>/<image>:$BUILD_NUMBER'
-            }
+        failure {
+            echo 'Pipeline failed!'
         }
     }
 }
