@@ -1,5 +1,8 @@
 pipeline {
     agent any
+    tools {
+        maven 'Maven 3.8.6' // Use the Maven installed in Jenkins
+    }
     stages {
         stage('Build') {
             steps {
