@@ -1,36 +1,36 @@
 pipeline {
-    agent any
-    tools {
-        maven 'Maven 3.8.6' // Use the Maven installed in Jenkins
+    agent {
+        docker {
+            image 'node:14'
+        }
     }
     stages {
-        stage('Build') {
+        stage('Clone repository') {
             steps {
-                sh 'mvn clean install'
-                echo 'Build Stage Successful'
+                git branch: 'main',
+                    url: 'https://github.com/<user>/<repo>.git'
             }
         }
-        stage('Test') {
+        stage('Install dependencies') {
             steps {
-                sh 'mvn test'
-                echo 'Test Stage Successful'
-            }
-            post {
-                always {
-                    junit 'target/surefire-reports/*.xml'
-                }
+                sh 'npm install'
             }
         }
-        stage('Deploy') {
+        stage('Build application') {
             steps {
-                sh 'mvn deploy'
-                echo 'Deployment Successful'
+                sh 'npm run build'
             }
         }
-    }
-    post {
-        failure {
-            echo 'Pipeline failed'
+        stage('Test application') {
+            steps {
+                sh 'npm test'
+            }
+        }
+        stage('Push Docker image') {
+            steps {
+                sh 'docker build -t <user>/<image>:$BUILD_NUMBER .'
+                sh 'docker push <user>/<image>:$BUILD_NUMBER'
+            }
         }
     }
 }
